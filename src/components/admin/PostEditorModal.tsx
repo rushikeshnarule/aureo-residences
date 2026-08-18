@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WordPressPost } from '../../data/residences';
-import { X, Check, BookOpen } from 'lucide-react';
+import { X, Check, BookOpen, Sparkles, Loader2 } from 'lucide-react';
+import { generateArchitecturalMonograph } from '../../services/geminiService';
 
 interface PostEditorModalProps {
   isOpen: boolean;
@@ -29,6 +30,29 @@ export const PostEditorModal: React.FC<PostEditorModalProps> = ({
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('Cantilever, Concrete, Alpine, Engineering');
   const [isFeatured, setIsFeatured] = useState(false);
+
+  // AI Generation State
+  const [aiTopic, setAiTopic] = useState('');
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+
+  const handleAiGenerate = async () => {
+    if (!aiTopic.trim()) return;
+    setIsGeneratingAi(true);
+
+    try {
+      const generated = await generateArchitecturalMonograph(aiTopic, category);
+      setTitle(generated.title);
+      setSlug(generated.slug);
+      setExcerpt(generated.excerpt);
+      setContent(generated.content);
+      setTags(generated.tags.join(', '));
+      setReadTime(generated.readTime);
+    } catch (err) {
+      console.error('AI generation error:', err);
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
 
   useEffect(() => {
     if (initialPost) {
@@ -130,6 +154,45 @@ export const PostEditorModal: React.FC<PostEditorModalProps> = ({
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto bg-white">
+            
+            {/* AI Assistant Quick Generator Banner */}
+            <div className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-300/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-aureo-gold-800 flex items-center gap-1.5 font-mono">
+                  <Sparkles size={13} className="text-aureo-gold-600" />
+                  <span>Draft Full Monograph with Gemini AI</span>
+                </span>
+                <span className="text-[10px] text-stone-400 font-mono">Gemini 2.5 Flash</span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={aiTopic}
+                  onChange={(e) => setAiTopic(e.target.value)}
+                  placeholder="e.g. Diurnal light sculpting with post-tensioned basalt cantilevers..."
+                  className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-aureo-gold-500/30"
+                />
+                <button
+                  type="button"
+                  onClick={handleAiGenerate}
+                  disabled={!aiTopic.trim() || isGeneratingAi}
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                >
+                  {isGeneratingAi ? (
+                    <>
+                      <Loader2 size={13} className="animate-spin text-aureo-gold-400" />
+                      <span>Drafting Essay...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={13} className="text-aureo-gold-400" />
+                      <span>Auto-Generate</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
             
             {/* Title & Slug */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

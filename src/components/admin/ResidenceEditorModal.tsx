@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArchitecturalPiece } from '../../data/residences';
-import { X, Building, Check } from 'lucide-react';
+import { X, Building, Check, Sparkles, Loader2 } from 'lucide-react';
+import { generateEstateDossier } from '../../services/geminiService';
 
 interface ResidenceEditorModalProps {
   isOpen: boolean;
@@ -29,6 +30,37 @@ export const ResidenceEditorModal: React.FC<ResidenceEditorModalProps> = ({
   const [architect, setArchitect] = useState('Aureo Atelier');
   const [bedrooms, setBedrooms] = useState('5 Suites');
   const [lotSize, setLotSize] = useState('1.4 Acres');
+
+  // AI Generation State
+  const [aiConcept, setAiConcept] = useState('');
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+
+  const handleAiGenerate = async () => {
+    if (!aiConcept.trim()) return;
+    setIsGeneratingAi(true);
+
+    try {
+      const generated = await generateEstateDossier(
+        aiConcept,
+        category === 'all' ? 'lakefront' : category
+      );
+      setTitle(generated.title);
+      setLocation(generated.location);
+      setSubtitle(generated.subtitle);
+      setDescription(generated.description);
+      setNarrative(generated.narrative);
+      setTag(generated.tag);
+      setArea(generated.specs.area);
+      setCompletion(generated.specs.completion);
+      setArchitect(generated.specs.architect);
+      setBedrooms(generated.specs.bedrooms);
+      setLotSize(generated.specs.lotSize);
+    } catch (err) {
+      console.error('AI Estate generation error:', err);
+    } finally {
+      setIsGeneratingAi(false);
+    }
+  };
 
   useEffect(() => {
     if (initialResidence) {
@@ -130,6 +162,45 @@ export const ResidenceEditorModal: React.FC<ResidenceEditorModalProps> = ({
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto bg-white">
+            
+            {/* AI Assistant Quick Generator Banner */}
+            <div className="p-4 rounded-2xl bg-[#faf8f5] border border-stone-300/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-aureo-gold-800 flex items-center gap-1.5 font-mono">
+                  <Sparkles size={13} className="text-aureo-gold-600" />
+                  <span>Generate Estate Specifications with Gemini AI</span>
+                </span>
+                <span className="text-[10px] text-stone-400 font-mono">Gemini 2.5 Flash</span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={aiConcept}
+                  onChange={(e) => setAiConcept(e.target.value)}
+                  placeholder="e.g. Cliffside Mediterranean villa with private sea cove and post-tensioned travertine..."
+                  className="flex-1 px-3.5 py-2 rounded-xl bg-white border border-stone-300 text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-aureo-gold-500/30"
+                />
+                <button
+                  type="button"
+                  onClick={handleAiGenerate}
+                  disabled={!aiConcept.trim() || isGeneratingAi}
+                  className="px-5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                >
+                  {isGeneratingAi ? (
+                    <>
+                      <Loader2 size={13} className="animate-spin text-aureo-gold-400" />
+                      <span>Synthesizing Dossier...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={13} className="text-aureo-gold-400" />
+                      <span>Auto-Generate</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
             
             {/* Title & Location */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { NAV_LINKS } from '../data/residences';
 import { MenuDrawer } from './MenuDrawer';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Sparkles } from 'lucide-react';
 
 interface NavbarProps {
   onOpenInquiry?: () => void;
+  onOpenAIConcierge?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, onOpenAIConcierge }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -69,8 +70,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry }) => {
           </a>
 
           {/* Right Navigation & Inquiry Trigger */}
-          <div className="flex items-center space-x-5 sm:space-x-7">
-            <nav className="hidden md:flex items-center space-x-7 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700">
+          <div className="flex items-center space-x-3 sm:space-x-5">
+            <nav className="hidden md:flex items-center space-x-6 text-xs font-semibold uppercase tracking-[0.18em] text-stone-700">
               <a
                 href="#details"
                 className="hover:text-aureo-gold-700 transition-colors py-1 relative group"
@@ -85,14 +86,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry }) => {
                 <span>{NAV_LINKS[3].label}</span>
                 <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-aureo-gold-600 transition-all duration-300 group-hover:w-full" />
               </a>
-              <a
-                href="#inquire"
-                className="hover:text-aureo-gold-700 transition-colors py-1 relative group"
-              >
-                <span>{NAV_LINKS[4].label}</span>
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-aureo-gold-600 transition-all duration-300 group-hover:w-full" />
-              </a>
             </nav>
+
+            {/* AI Advisory Concierge Button */}
+            {onOpenAIConcierge && (
+              <button
+                onClick={onOpenAIConcierge}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/80 text-stone-800 text-[10px] font-bold uppercase tracking-wider transition-colors border border-stone-200 cursor-pointer"
+                title="Open AI Architectural Concierge"
+              >
+                <Sparkles size={11} className="text-aureo-gold-700 animate-pulse" />
+                <span>AI Advisory</span>
+              </button>
+            )}
 
             {/* Nested CTA with "Button-in-Button" Trailing Icon */}
             <button
@@ -124,7 +130,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry }) => {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         onOpenInquiry={onOpenInquiry}
+        onOpenAIConcierge={onOpenAIConcierge}
       />
     </>
   );
 };
+

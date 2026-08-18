@@ -5,6 +5,12 @@ import { WordPressPost, ArchitecturalPiece } from '../../data/residences';
 import { PostEditorModal } from './PostEditorModal';
 import { ResidenceEditorModal } from './ResidenceEditorModal';
 import {
+  draftExecutiveInquiryResponse,
+  getGeminiApiKey,
+  setGeminiApiKey,
+  chatWithAureoAI
+} from '../../services/geminiService';
+import {
   BookOpen,
   Building,
   Edit3,
@@ -26,7 +32,11 @@ import {
   MapPin,
   DollarSign,
   ArrowLeft,
-  LogOut
+  LogOut,
+  Copy,
+  Loader2,
+  ExternalLink,
+  X
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -95,6 +105,48 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [newMediaTitle, setNewMediaTitle] = useState('');
   const [newMediaUrl, setNewMediaUrl] = useState('');
   const [newMediaCat, setNewMediaCat] = useState('Architecture');
+
+  // AI Inquiry Letter Drafting States
+  const [draftingInquiry, setDraftingInquiry] = useState<ClientInquiry | null>(null);
+  const [draftedLetterText, setDraftedLetterText] = useState('');
+  const [isDraftingLetter, setIsDraftingLetter] = useState(false);
+  const [isLetterCopied, setIsLetterCopied] = useState(false);
+
+  // AI Settings State
+  const [geminiKeyInput, setGeminiKeyInput] = useState(getGeminiApiKey());
+  const [keyTestStatus, setKeyTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+
+  const handleDraftAiLetter = async (inq: ClientInquiry) => {
+    setDraftingInquiry(inq);
+    setIsDraftingLetter(true);
+    setIsLetterCopied(false);
+    setDraftedLetterText('');
+
+    try {
+      const letter = await draftExecutiveInquiryResponse(inq);
+      setDraftedLetterText(letter);
+    } catch (err) {
+      console.error('Failed to draft letter:', err);
+    } finally {
+      setIsDraftingLetter(false);
+    }
+  };
+
+  const handleTestApiKey = async () => {
+    setKeyTestStatus('testing');
+    try {
+      setGeminiApiKey(geminiKeyInput);
+      const testReply = await chatWithAureoAI([], 'Verify system connection in one short sentence.');
+      if (testReply) {
+        setKeyTestStatus('success');
+        showToast('Gemini AI connection verified successfully.');
+      } else {
+        setKeyTestStatus('error');
+      }
+    } catch (err) {
+      setKeyTestStatus('error');
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -634,6 +686,75 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   ))}
                 </div>
 
+                {/* AI Intelligence Engine Settings Card */}
+                <div className="p-6 rounded-2xl bg-stone-900 text-white space-y-4 shadow-lg border border-stone-800">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-aureo-gold-500/20 text-aureo-gold-400 flex items-center justify-center border border-aureo-gold-500/30">
+                        <Sparkles size={16} />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-serif font-bold text-white tracking-wide">
+                          AUREO Intelligence · Gemini AI Engine
+                        </h4>
+                        <p className="text-[11px] text-stone-400 font-mono">
+                          Active Model: Google Gemini 2.5 Flash · Multimodal & Spatial Reasoning
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider border border-emerald-500/30">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>Connected</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-2 border-t border-stone-800">
+                    <label className="text-xs font-semibold text-stone-300 block">
+                      Google Gemini API Key
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="password"
+                        value={geminiKeyInput}
+                        onChange={(e) => setGeminiKeyInput(e.target.value)}
+                        placeholder="AIzaSy..."
+                        className="flex-1 px-4 py-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white placeholder-stone-500 font-mono focus:outline-none focus:border-aureo-gold-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleTestApiKey}
+                        disabled={keyTestStatus === 'testing'}
+                        className="px-5 py-2.5 rounded-xl bg-aureo-gold-600 hover:bg-aureo-gold-500 text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        {keyTestStatus === 'testing' ? (
+                          <>
+                            <Loader2 size={13} className="animate-spin" />
+                            <span>Verifying...</span>
+                          </>
+                        ) : keyTestStatus === 'success' ? (
+                          <>
+                            <Check size={13} className="text-emerald-300" />
+                            <span>Verified</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles size={13} />
+                            <span>Save & Test Key</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    {keyTestStatus === 'error' && (
+                      <p className="text-[11px] text-rose-400">
+                        Verification failed. Please check the API key format and quotas.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="pt-4 flex justify-end">
                   <button
                     type="submit"
@@ -712,7 +833,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     </div>
 
                     {/* Status & Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {/* AI Draft Executive Letter Button */}
+                      <button
+                        onClick={() => handleDraftAiLetter(inq)}
+                        className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                        title="Draft Confidential Executive Reply with Gemini AI"
+                      >
+                        <Sparkles size={12} className="text-aureo-gold-400" />
+                        <span>✨ Draft AI Letter</span>
+                      </button>
+
                       <select
                         value={inq.status}
                         onChange={(e) => {
@@ -880,6 +1011,107 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         onSave={handleSaveResidence}
         initialResidence={editingResidence}
       />
+
+      {/* AI Drafted Executive Letter Modal */}
+      <AnimatePresence>
+        {draftingInquiry && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setDraftingInquiry(null)}
+            className="fixed inset-0 z-50 bg-black/65 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-2xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl border border-stone-200 my-auto flex flex-col max-h-[85vh]"
+            >
+              <div className="bg-[#f5f0e6] p-6 border-b border-stone-200 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles size={14} className="text-aureo-gold-700" />
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-aureo-gold-800 font-mono">
+                      Gemini AI Executive Reply Drafter
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-serif font-bold text-stone-900">
+                    Confidential Reply for {draftingInquiry.fullName}
+                  </h3>
+                </div>
+
+                <button
+                  onClick={() => setDraftingInquiry(null)}
+                  className="w-9 h-9 rounded-full bg-stone-200/80 hover:bg-stone-300 text-stone-700 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="p-6 overflow-y-auto space-y-4">
+                {isDraftingLetter ? (
+                  <div className="py-16 text-center space-y-3">
+                    <Loader2 size={28} className="animate-spin text-aureo-gold-600 mx-auto" />
+                    <p className="text-xs font-semibold text-stone-700 font-mono">
+                      Synthesizing bespoke executive reply via Gemini 2.5 Flash...
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between text-xs text-stone-500 font-mono pb-2 border-b border-stone-100">
+                      <span>Recipient: {draftingInquiry.email}</span>
+                      <span>Tier: {draftingInquiry.investmentTier}</span>
+                    </div>
+
+                    <textarea
+                      rows={12}
+                      value={draftedLetterText}
+                      onChange={(e) => setDraftedLetterText(e.target.value)}
+                      className="w-full p-4 rounded-xl bg-stone-50 border border-stone-200 text-xs sm:text-sm text-stone-800 font-light leading-relaxed focus:outline-none focus:ring-2 focus:ring-aureo-gold-500/30"
+                    />
+
+                    <div className="pt-2 flex items-center justify-between flex-wrap gap-3">
+                      <a
+                        href={`mailto:${draftingInquiry.email}?subject=${encodeURIComponent('AUREO Residences — Confidential Acquisition Briefing')}&body=${encodeURIComponent(draftedLetterText)}`}
+                        className="px-5 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <ExternalLink size={13} />
+                        <span>Open in Email App</span>
+                      </a>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(draftedLetterText);
+                            setIsLetterCopied(true);
+                            setTimeout(() => setIsLetterCopied(false), 2000);
+                            showToast('Letter copied to clipboard.');
+                          }}
+                          className="px-6 py-2.5 rounded-xl bg-aureo-gold-600 hover:bg-aureo-gold-500 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                        >
+                          {isLetterCopied ? (
+                            <>
+                              <Check size={14} />
+                              <span>Letter Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={14} />
+                              <span>Copy Letter</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

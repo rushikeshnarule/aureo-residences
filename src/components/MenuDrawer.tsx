@@ -7,12 +7,14 @@ interface MenuDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenInquiry?: () => void;
+  onOpenAIConcierge?: () => void;
 }
 
 export const MenuDrawer: React.FC<MenuDrawerProps> = ({
   isOpen,
   onClose,
-  onOpenInquiry
+  onOpenInquiry,
+  onOpenAIConcierge
 }) => {
   return (
     <AnimatePresence>
@@ -84,7 +86,20 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              {onOpenAIConcierge && (
+                <button
+                  onClick={() => {
+                    onClose();
+                    onOpenAIConcierge();
+                  }}
+                  className="px-5 py-2.5 rounded-full bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Sparkles size={12} className="text-aureo-gold-400" />
+                  <span>AI Advisory Concierge</span>
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   onClose();
@@ -92,7 +107,6 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
                 }}
                 className="px-6 py-2.5 rounded-full bg-aureo-gold-600 hover:bg-aureo-gold-500 text-white font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-1.5 cursor-pointer shadow-md"
               >
-                <Sparkles size={12} />
                 <span>Private Consultation</span>
               </button>
             </div>
@@ -102,3 +116,4 @@ export const MenuDrawer: React.FC<MenuDrawerProps> = ({
     </AnimatePresence>
   );
 };
+

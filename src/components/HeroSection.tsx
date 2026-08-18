@@ -8,6 +8,8 @@ interface HeroSectionProps {
   onImageClick?: (image: { url: string; title?: string; caption?: string; location?: string }) => void;
   onOpenVirtualTour?: () => void;
   onSelectDestination?: (dest: DestinationCard) => void;
+  onOpenAIConcierge?: () => void;
+  onOpenSpatialBrief?: () => void;
 }
 
 type LightingMode = 'day' | 'sunset' | 'twilight';
@@ -15,7 +17,9 @@ type LightingMode = 'day' | 'sunset' | 'twilight';
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onImageClick,
   onOpenVirtualTour,
-  onSelectDestination
+  onSelectDestination,
+  onOpenAIConcierge,
+  onOpenSpatialBrief
 }) => {
   const { heroData } = useAureo();
   const [isPlaying, setIsPlaying] = useState(true);
@@ -48,55 +52,52 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   };
 
   return (
-    <section className="relative w-full pt-32 sm:pt-40 md:pt-48 pb-16 hero-gradient overflow-hidden selection:bg-aureo-gold-500 selection:text-white">
+    <section className="relative w-full overflow-hidden hero-gradient pt-24 sm:pt-28 pb-16 sm:pb-24 border-b border-stone-200/80">
       
-      {/* 1. Ambient Video Background Layer */}
+      {/* Background Video Layer */}
       {heroData.videoUrl && (
-        <div className="absolute inset-0 -inset-x-12 -top-10 -bottom-10 rounded-[3rem] overflow-hidden pointer-events-none z-0 flex items-center justify-center opacity-15 mix-blend-multiply">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-20 mask-hero-fade">
           <video
             id="hero-bg-video"
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover transform scale-110 filter contrast-125"
+            className="w-full h-full object-cover"
           >
-            <source
-              src={heroData.videoUrl}
-              type="video/mp4"
-            />
+            <source src={heroData.videoUrl} type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-radial-gradient from-transparent via-stone-100/30 to-stone-200/60" />
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 md:px-16 relative z-10">
+      {/* Hero Content Enclosure */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-12 text-center">
         
-        {/* Top Text Content */}
-        <div className="text-center max-w-4xl mx-auto mb-10 sm:mb-14">
+        {/* 1. Header Text Container with Staggered Entrance */}
+        <div className="max-w-4xl mx-auto pt-6 sm:pt-10">
           
-          {/* Eyebrow Pill Badge */}
+          {/* Eyebrow Pill */}
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-stone-200/80 text-stone-800 text-[10px] font-bold tracking-[0.25em] uppercase mb-6 shadow-sm"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-stone-200/90 text-stone-900 text-[10px] sm:text-xs font-semibold tracking-[0.25em] uppercase mb-6 shadow-sm"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-aureo-gold-600 animate-pulse" />
-            <span>Monolithic Private Estates</span>
+            <span>Zurich · Milan · Aspen · Costa Brava</span>
           </motion.div>
 
-          {/* Staggered Spring Luxury Serif Headline */}
+          {/* Staggered Serif Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-[84px] font-serif font-normal text-stone-900 tracking-wider leading-[1.05] uppercase drop-shadow-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.1 }}
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-stone-900 tracking-tight leading-[1.05]"
           >
             {heroData.headline.split('\n').map((line, i) => (
-              <span key={i} className="block overflow-hidden">
+              <span key={i} className="block overflow-hidden pb-1">
                 <motion.span
-                  initial={{ y: '100%' }}
+                  initial={{ y: 80 }}
                   animate={{ y: 0 }}
                   transition={{
                     duration: 0.9,
@@ -126,7 +127,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4"
+            className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
           >
             {/* Primary CTA with Nested Trailing Icon */}
             <a
@@ -139,20 +140,42 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
             </a>
 
+            {/* AI Advisory Concierge CTA */}
+            {onOpenAIConcierge && (
+              <button
+                onClick={onOpenAIConcierge}
+                className="group px-5 py-3 rounded-full bg-white/90 hover:bg-white text-stone-900 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md active:scale-95 border border-aureo-gold-500/40 flex items-center gap-2 backdrop-blur-sm cursor-pointer"
+              >
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>AI Advisory</span>
+              </button>
+            )}
+
+            {/* AI Spatial Commission Brief CTA */}
+            {onOpenSpatialBrief && (
+              <button
+                onClick={onOpenSpatialBrief}
+                className="group px-5 py-3 rounded-full bg-[#f3efe8] hover:bg-[#eae3d5] text-stone-800 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-stone-300/80 flex items-center gap-2 backdrop-blur-sm cursor-pointer"
+              >
+                <span className="text-aureo-gold-700">✨</span>
+                <span>Spatial Feasibility Brief</span>
+              </button>
+            )}
+
             {/* Secondary 360 Tour Trigger */}
             <button
               onClick={onOpenVirtualTour}
-              className="group px-7 py-3 rounded-full bg-white/90 hover:bg-white text-stone-800 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md active:scale-95 border border-stone-200 flex items-center gap-2.5 backdrop-blur-sm cursor-pointer"
+              className="group px-6 py-3 rounded-full bg-white/80 hover:bg-white text-stone-800 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 border border-stone-200 flex items-center gap-2 backdrop-blur-sm cursor-pointer"
             >
-              <Compass size={15} className="text-aureo-gold-600 group-hover:rotate-45 transition-transform duration-500" />
-              <span>360° Virtual Tour</span>
+              <Compass size={14} className="text-aureo-gold-600 group-hover:rotate-45 transition-transform duration-500" />
+              <span>360° Tour</span>
             </button>
 
             {/* Ambient Background Video Playback Toggle */}
             <button
               onClick={toggleVideoPlay}
               title={isPlaying ? "Pause Ambient Video" : "Play Ambient Video"}
-              className="px-4 py-3 rounded-full bg-white/80 hover:bg-white text-stone-700 text-xs font-semibold backdrop-blur-md border border-stone-200 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="px-3.5 py-3 rounded-full bg-white/80 hover:bg-white text-stone-700 text-xs font-semibold backdrop-blur-md border border-stone-200 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
               {isPlaying ? (
                 <>

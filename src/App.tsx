@@ -16,6 +16,8 @@ import { PostReaderModal } from './components/PostReaderModal';
 import { FloatingInquiryButton } from './components/FloatingInquiryButton';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminPanel } from './components/admin/AdminPanel';
+import { AureoAIConciergeModal } from './components/ai/AureoAIConciergeModal';
+import { SpatialArchitectBriefModal } from './components/ai/SpatialArchitectBriefModal';
 import { WordPressPost, DestinationCard } from './data/residences';
 
 function AureoApp() {
@@ -77,6 +79,12 @@ function AureoApp() {
   // Virtual Tour 360 Modal state
   const [isVirtualTourOpen, setIsVirtualTourOpen] = useState(false);
 
+  // AI Concierge Modal state
+  const [isAIConciergeOpen, setIsAIConciergeOpen] = useState(false);
+
+  // AI Bespoke Spatial Brief Modal state
+  const [isSpatialBriefOpen, setIsSpatialBriefOpen] = useState(false);
+
   // WordPress Post Reader Modal state
   const [activePost, setActivePost] = useState<WordPressPost | null>(null);
 
@@ -121,6 +129,7 @@ function AureoApp() {
       {/* Dynamic Sticky Luxury Navigation */}
       <Navbar
         onOpenInquiry={() => handleOpenInquiry('General')}
+        onOpenAIConcierge={() => setIsAIConciergeOpen(true)}
       />
 
       {/* Main Page Flow */}
@@ -130,6 +139,8 @@ function AureoApp() {
           onImageClick={(img) => setActiveImage(img)}
           onOpenVirtualTour={() => setIsVirtualTourOpen(true)}
           onSelectDestination={handleSelectDestination}
+          onOpenAIConcierge={() => setIsAIConciergeOpen(true)}
+          onOpenSpatialBrief={() => setIsSpatialBriefOpen(true)}
         />
 
         {/* 2. Interactive Materiality & Spatial Craft Hotspots */}
@@ -170,6 +181,8 @@ function AureoApp() {
       <FloatingInquiryButton
         onOpenInquiry={() => handleOpenInquiry('General')}
         onOpenVirtualTour={() => setIsVirtualTourOpen(true)}
+        onOpenAIConcierge={() => setIsAIConciergeOpen(true)}
+        onOpenSpatialBrief={() => setIsSpatialBriefOpen(true)}
       />
 
       {/* High-Resolution Architectural Lightbox */}
@@ -202,6 +215,26 @@ function AureoApp() {
         post={activePost}
         onClose={() => setActivePost(null)}
       />
+
+      {/* AUREO Intelligence · Gemini AI Architectural Concierge Modal */}
+      <AureoAIConciergeModal
+        isOpen={isAIConciergeOpen}
+        onClose={() => setIsAIConciergeOpen(false)}
+        onOpenInquiry={(loc?: string) => {
+          setIsAIConciergeOpen(false);
+          handleOpenInquiry(loc || 'General');
+        }}
+      />
+
+      {/* Gemini AI Bespoke Spatial Commission Feasibility Modal */}
+      <SpatialArchitectBriefModal
+        isOpen={isSpatialBriefOpen}
+        onClose={() => setIsSpatialBriefOpen(false)}
+        onOpenInquiry={(loc?: string) => {
+          setIsSpatialBriefOpen(false);
+          handleOpenInquiry(loc || 'General');
+        }}
+      />
     </div>
   );
 }
@@ -215,3 +248,4 @@ export function App() {
 }
 
 export default App;
+
