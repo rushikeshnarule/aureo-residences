@@ -1,6 +1,6 @@
 <?php
 /**
- * Google Gemini API Client with Auto-Discovery & Multi-Model Support
+ * Google Gemini API Client - All Models & Multi-Tier Fallback
  */
 if ( ! defined( "ABSPATH" ) ) {
     exit;
@@ -8,37 +8,101 @@ if ( ! defined( "ABSPATH" ) ) {
 
 class Aureo_AI_Gemini_Client {
 
-    /**
-     * Candidate Gemini models in order of performance and availability
-     */
-    private static $candidate_models = array(
-        "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-pro",
-        "gemini-1.5-pro-latest",
-        "gemini-pro"
+    public static $all_models = array(
+        "auto"                    => "Auto-Detect Best Available Model",
+        "gemini-2.5-flash"        => "Gemini 2.5 Flash (Next-Gen Ultra Fast)",
+        "gemini-2.5-pro"          => "Gemini 2.5 Pro (Next-Gen Deep Reasoning)",
+        "gemini-2.0-flash"        => "Gemini 2.0 Flash (Recommended)",
+        "gemini-2.0-flash-lite"   => "Gemini 2.0 Flash Lite (Fast & Efficient)",
+        "gemini-2.0-pro-exp"      => "Gemini 2.0 Pro Experimental",
+        "gemini-1.5-flash"        => "Gemini 1.5 Flash",
+        "gemini-1.5-flash-latest" => "Gemini 1.5 Flash Latest",
+        "gemini-1.5-flash-8b"     => "Gemini 1.5 Flash 8B",
+        "gemini-1.5-pro"          => "Gemini 1.5 Pro",
+        "gemini-1.5-pro-latest"   => "Gemini 1.5 Pro Latest",
+        "gemini-pro"              => "Gemini 1.0 Pro (Legacy)",
     );
 
     /**
-     * Test connection to Gemini API by auto-detecting the active model
+     * Sanitize and normalize API key (remove accidental quotes/spaces/newlines)
      */
-    public static function test_connection( $api_key = "" ) {
+    public static function clean_key( $key ) {
+        $key = trim( (string) $key );
+        $key = trim( $key, "\"'\r\n\t " );
+        return sanitize_text_field( $key );
+    }
+
+    /**
+     * Make resilient HTTP request to Google API with SSL fallback
+     */
+    private static function http_request( $url, $payload, $api_key ) {
+        $args = array(
+            "method"      => "POST",
+            "timeout"     => 45,
+            "redirection" => 5,
+            "httpversion" => "1.1",
+            "headers"     => array(
+                "Content-Type"   => "application/json",
+                "x-goog-api-key" => $api_key,
+                "User-Agent"     => "WordPress/" . get_bloginfo( "version" ) . "; AureoAI/" . AUREO_AI_VERSION,
+            ),
+            "body"        => wp_json_encode( $payload ),
+            "sslverify"   => true,
+        );
+
+        $response = wp_remote_post( $url, $args );
+
+        // If SSL certificate bundle fails on local/shared hosting, retry with sslverify false
+        if ( is_wp_error( $response ) ) {
+            $err_str = $response->get_error_message();
+            if ( false !== stripos( $err_str, "ssl" ) || false !== stripos( $err_str, "certificate" ) || false !== stripos( $err_str, "curl error 60" ) ) {
+                $args["sslverify"] = false;
+                $response = wp_remote_post( $url, $args );
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Test connection to Gemini API and detect best available model
+     */
+    public static function test_connection( $api_key = "", $requested_model = "" ) {
+        $api_key = self::clean_key( $api_key );
         if ( empty( $api_key ) ) {
-            $api_key = get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY );
+            $api_key = self::clean_key( get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY ) );
+        }
+        if ( empty( $requested_model ) ) {
+            $requested_model = get_option( "aureo_ai_model", "auto" );
         }
 
         if ( empty( $api_key ) ) {
             return new WP_Error( "no_key", "Please enter a Google Gemini API key." );
         }
 
-        $api_key = trim( $api_key );
-        $last_error = "";
+        $models_to_test = array();
+        if ( "auto" !== $requested_model && ! empty( $requested_model ) ) {
+            $models_to_test[] = $requested_model;
+        }
 
-        // Test across candidate models and API versions
-        foreach ( self::$candidate_models as $model ) {
-            $versions = array( "v1beta", "v1" );
-            foreach ( $versions as $version ) {
+        $fallbacks = array(
+            "gemini-2.0-flash",
+            "gemini-2.5-flash",
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-1.5-pro",
+            "gemini-2.0-flash-lite",
+            "gemini-pro"
+        );
+        foreach ( $fallbacks as $f ) {
+            if ( ! in_array( $f, $models_to_test, true ) ) {
+                $models_to_test[] = $f;
+            }
+        }
+
+        $last_error = "";
+        foreach ( $models_to_test as $model ) {
+            foreach ( array( "v1beta", "v1" ) as $version ) {
                 $url = "https://generativelanguage.googleapis.com/" . $version . "/models/" . $model . ":generateContent?key=" . $api_key;
                 $payload = array(
                     "contents" => array(
@@ -54,24 +118,18 @@ class Aureo_AI_Gemini_Client {
                     )
                 );
 
-                $response = wp_remote_post( $url, array(
-                    "headers" => array(
-                        "Content-Type"   => "application/json",
-                        "x-goog-api-key" => $api_key
-                    ),
-                    "body"    => wp_json_encode( $payload ),
-                    "timeout" => 15
-                ) );
+                $response = self::http_request( $url, $payload, $api_key );
 
                 if ( ! is_wp_error( $response ) ) {
                     $code = wp_remote_retrieve_response_code( $response );
                     if ( 200 === $code ) {
+                        update_option( "aureo_ai_gemini_api_key", $api_key );
                         update_option( "aureo_ai_working_model", $model );
                         update_option( "aureo_ai_api_version", $version );
                         return array(
                             "model"   => $model,
                             "version" => $version,
-                            "message" => sprintf( "Connected successfully to Google %s (%s)!", $model, $version )
+                            "message" => sprintf( "Connected successfully! Active Engine: Google %s (%s).", $model, $version )
                         );
                     }
                     $body = wp_remote_retrieve_body( $response );
@@ -79,29 +137,149 @@ class Aureo_AI_Gemini_Client {
                     if ( isset( $data["error"]["message"] ) ) {
                         $last_error = $data["error"]["message"];
                     }
+                } else {
+                    $last_error = $response->get_error_message();
                 }
             }
         }
 
-        return new WP_Error( "connection_failed", $last_error ? $last_error : "Could not connect to Gemini API. Ensure Generative Language API is enabled or grab a key from https://aistudio.google.com/app/apikey" );
+        return new WP_Error( "connection_failed", $last_error ? $last_error : "Connection failed. Please verify your Gemini key at https://aistudio.google.com/app/apikey" );
     }
 
     /**
-     * Generate Structured Post Content via Gemini (with multi-model fallback & in-engine synthesis)
+     * Query ModelService.ListModels to retrieve all active models for user account
      */
-    public static function generate_article( $niche, $custom_instructions = "" ) {
-        $api_key       = trim( get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY ) );
+    public static function fetch_account_models( $api_key = "" ) {
+        $api_key = self::clean_key( $api_key );
+        if ( empty( $api_key ) ) {
+            $api_key = self::clean_key( get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY ) );
+        }
+        if ( empty( $api_key ) ) {
+            return new WP_Error( "no_key", "Please enter a Gemini API key." );
+        }
+
+        $url = "https://generativelanguage.googleapis.com/v1beta/models?key=" . $api_key;
+        $args = array(
+            "timeout"   => 20,
+            "headers"   => array( "x-goog-api-key" => $api_key ),
+            "sslverify" => true,
+        );
+        $response = wp_remote_get( $url, $args );
+
+        if ( is_wp_error( $response ) ) {
+            $args["sslverify"] = false;
+            $response = wp_remote_get( $url, $args );
+        }
+
+        if ( is_wp_error( $response ) ) {
+            return $response;
+        }
+
+        $code = wp_remote_retrieve_response_code( $response );
+        $body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        if ( 200 !== $code || empty( $data["models"] ) ) {
+            $msg = isset( $data["error"]["message"] ) ? $data["error"]["message"] : "HTTP " . $code;
+            return new WP_Error( "api_error", $msg );
+        }
+
+        $available = array();
+        foreach ( $data["models"] as $m ) {
+            if ( ! empty( $m["supportedGenerationMethods"] ) && in_array( "generateContent", $m["supportedGenerationMethods"], true ) ) {
+                $clean_name = str_replace( "models/", "", $m["name"] );
+                $label = ! empty( $m["displayName"] ) ? $m["displayName"] . " (" . $clean_name . ")" : $clean_name;
+                $available[ $clean_name ] = $label;
+            }
+        }
+
+        update_option( "aureo_ai_gemini_api_key", $api_key );
+        return $available;
+    }
+
+    /**
+     * Robust JSON article parser with regex fallback
+     */
+    public static function parse_json_article( $raw_text ) {
+        if ( empty( $raw_text ) ) return false;
+
+        // 1. Try standard JSON decode after cleaning fences
+        $clean = trim( preg_replace( '/^\x60{3}(?:json)?|\x60{3}$/m', '', $raw_text ) );
+        $parsed = json_decode( $clean, true );
+        if ( is_array( $parsed ) && ! empty( $parsed["title"] ) && ! empty( $parsed["content"] ) ) {
+            return $parsed;
+        }
+
+        // 2. Try regex extraction if JSON syntax was imperfect
+        $title = ""; $content = ""; $excerpt = ""; $category = ""; $tags = array(); $image_kw = "";
+
+        if ( preg_match( '/"title"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/', $clean, $m ) ) {
+            $title = stripslashes( $m[1] );
+        }
+        if ( preg_match( '/"excerpt"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/', $clean, $m ) ) {
+            $excerpt = stripslashes( $m[1] );
+        }
+        if ( preg_match( '/"category"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/', $clean, $m ) ) {
+            $category = stripslashes( $m[1] );
+        }
+        if ( preg_match( '/"image_keyword"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/', $clean, $m ) ) {
+            $image_kw = stripslashes( $m[1] );
+        }
+        if ( preg_match( '/"content"\s*:\s*"([\s\S]+?)"\s*(?:,\s*"|}\s*$)/', $clean, $m ) ) {
+            $content = stripslashes( $m[1] );
+        }
+
+        if ( ! empty( $title ) && ! empty( $content ) ) {
+            return array(
+                "title"         => $title,
+                "slug"          => sanitize_title( $title ),
+                "excerpt"       => $excerpt,
+                "category"      => $category,
+                "tags"          => array( "Architecture", "Engineering", "Innovation" ),
+                "image_keyword" => $image_kw,
+                "content"       => $content,
+            );
+        }
+
+        return false;
+    }
+
+    /**
+     * Generate Article via Gemini with Autonomous Fallback
+     */
+    public static function generate_article( $niche, $custom_opts = array() ) {
+        $api_key       = ! empty( $custom_opts["api_key"] ) ? self::clean_key( $custom_opts["api_key"] ) : self::clean_key( get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY ) );
+        $pref_model    = ! empty( $custom_opts["model"] ) ? $custom_opts["model"] : get_option( "aureo_ai_model", "auto" );
         $working_model = get_option( "aureo_ai_working_model", "gemini-2.0-flash" );
-        $api_version   = get_option( "aureo_ai_api_version", "v1beta" );
+        $tone          = ! empty( $custom_opts["tone"] ) ? $custom_opts["tone"] : get_option( "aureo_ai_tone", "authoritative" );
+        $word_count    = ! empty( $custom_opts["word_count"] ) ? $custom_opts["word_count"] : get_option( "aureo_ai_word_count", "standard" );
+
+        $words_instruction = "600-900 words";
+        if ( "short" === $word_count ) {
+            $words_instruction = "400-600 words";
+        } elseif ( "comprehensive" === $word_count ) {
+            $words_instruction = "900-1400 words";
+        }
+
+        $tone_instruction = "authoritative, timeless, and sophisticated";
+        if ( "technical" === $tone ) {
+            $tone_instruction = "highly analytical, data-driven, engineering-focused, and precise";
+        } elseif ( "conversational" === $tone ) {
+            $tone_instruction = "engaging, visionary, thought-provoking, and accessible";
+        } elseif ( "luxury" === $tone ) {
+            $tone_instruction = "ultra-luxurious, poetic, high-craft, and architectural";
+        }
 
         if ( ! empty( $api_key ) ) {
             $prompt_lines = array(
-                "You are a world-class industry analyst, senior engineer, and authoritative editorial writer.",
-                "Your task is to write a deeply engaging, professional, and comprehensive article in the following niche:",
+                "You are an expert editorial writer and industry analyst.",
+                "Your task is to write a deeply engaging, professional article in the following niche:",
                 "NICHE: " . esc_attr( $niche ),
+                "TONE: " . $tone_instruction,
+                "LENGTH: " . $words_instruction,
                 "",
                 "Requirements:",
-                "1. Output MUST be valid JSON only (no markdown fences outside).",
+                "1. Output MUST be valid JSON only (do not wrap in markdown code blocks).",
                 "2. JSON structure:",
                 "{",
                 '  "title": "Catchy, high-end editorial headline (60-80 characters)",',
@@ -109,18 +287,28 @@ class Aureo_AI_Gemini_Client {
                 '  "excerpt": "Compelling 2-sentence SEO summary (150-160 characters)",',
                 '  "category": "Primary Topic Name",',
                 '  "tags": ["Tag1", "Tag2", "Tag3", "Tag4"],',
-                '  "image_keyword": "Specific search term for an architectural, engineering, or business image",',
-                '  "content": "Full HTML article. Use <h2> and <h3> subheadings, rich paragraphs, <blockquote> for editorial pullquotes, <ul>/<li> for structured takeaways, and strong emphasis tags. Length: 600-900 words. Keep tone authoritative, timeless, and sophisticated."',
+                '  "image_keyword": "Specific search term for a relevant photograph",',
+                '  "content": "Full HTML article. Use <h2> and <h3> subheadings, rich paragraphs, <blockquote> for editorial pullquotes, <ul>/<li> for structured takeaways, and strong emphasis tags."',
                 "}"
             );
             $system_prompt = implode( "
 ", $prompt_lines );
 
-            // Build test list starting with working model
-            $models_to_try = array_unique( array_merge( array( $working_model ), self::$candidate_models ) );
+            $models_to_try = array();
+            if ( "auto" !== $pref_model && ! empty( $pref_model ) ) {
+                $models_to_try[] = $pref_model;
+            }
+            if ( ! in_array( $working_model, $models_to_try, true ) ) {
+                $models_to_try[] = $working_model;
+            }
+            foreach ( array_keys( self::$all_models ) as $k ) {
+                if ( "auto" !== $k && ! in_array( $k, $models_to_try, true ) ) {
+                    $models_to_try[] = $k;
+                }
+            }
 
             foreach ( $models_to_try as $model ) {
-                foreach ( array( $api_version, "v1beta", "v1" ) as $version ) {
+                foreach ( array( "v1beta", "v1" ) as $version ) {
                     $url = "https://generativelanguage.googleapis.com/" . $version . "/models/" . $model . ":generateContent?key=" . $api_key;
                     $payload = array(
                         "contents" => array(
@@ -137,40 +325,31 @@ class Aureo_AI_Gemini_Client {
                         )
                     );
 
-                    $response = wp_remote_post( $url, array(
-                        "headers" => array(
-                            "Content-Type"   => "application/json",
-                            "x-goog-api-key" => $api_key
-                        ),
-                        "body"    => wp_json_encode( $payload ),
-                        "timeout" => 45
-                    ) );
+                    $response = self::http_request( $url, $payload, $api_key );
 
                     if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
                         $body = wp_remote_retrieve_body( $response );
                         $data = json_decode( $body, true );
                         $text = isset( $data["candidates"][0]["content"]["parts"][0]["text"] ) ? $data["candidates"][0]["content"]["parts"][0]["text"] : "";
 
-                        if ( ! empty( $text ) ) {
-                            $clean_json = trim( preg_replace( '/^\x60{3}(?:json)?|\x60{3}$/m', '', $text ) );
-                            $parsed = json_decode( $clean_json, true );
-                            if ( is_array( $parsed ) && ! empty( $parsed["title"] ) && ! empty( $parsed["content"] ) ) {
-                                update_option( "aureo_ai_working_model", $model );
-                                $parsed["source_engine"] = "Google " . $model . " (" . $version . ")";
-                                return $parsed;
-                            }
+                        $parsed = self::parse_json_article( $text );
+                        if ( $parsed ) {
+                            update_option( "aureo_ai_working_model", $model );
+                            update_option( "aureo_ai_api_version", $version );
+                            $parsed["source_engine"] = "Google " . $model . " (" . $version . ")";
+                            return $parsed;
                         }
                     }
                 }
             }
         }
 
-        // Fallback to intelligent in-engine synthesizer
+        // Intelligent in-engine dynamic synthesis fallback
         return self::generate_fallback_article( $niche );
     }
 
     /**
-     * In-engine dynamic synthesis for guaranteed uptime
+     * In-engine dynamic synthesis for guaranteed daily publishing uptime
      */
     private static function generate_fallback_article( $niche ) {
         $niche_clean = ! empty( $niche ) ? sanitize_text_field( $niche ) : "Construction, Civil Engineering & Interior Architecture";

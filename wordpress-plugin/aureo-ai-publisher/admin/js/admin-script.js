@@ -1,8 +1,8 @@
-
 jQuery(document).ready(function ($) {
     var $banner = $('#aureo-status-banner');
     var $btnGenerate = $('#btn-generate-now');
     var $btnTest = $('#btn-test-key');
+    var $btnFetch = $('#btn-fetch-models');
     var $btnClearLogs = $('#btn-clear-logs');
 
     function showBanner(type, message) {
@@ -12,6 +12,18 @@ jQuery(document).ready(function ($) {
             .slideDown(200);
     }
 
+    function getLiveFormData() {
+        return {
+            api_key:     $.trim($('#aureo_ai_gemini_api_key').val()),
+            model:       $('#aureo_ai_model').val(),
+            niche:       $('#aureo_ai_niche').val(),
+            tone:        $('#aureo_ai_tone').val(),
+            word_count:  $('#aureo_ai_word_count').val(),
+            post_status: $('#aureo_ai_post_status').val(),
+            category:    $('#aureo_ai_category').val(),
+        };
+    }
+
     // 1. Generate Now Trigger
     $btnGenerate.on('click', function (e) {
         e.preventDefault();
@@ -19,20 +31,21 @@ jQuery(document).ready(function ($) {
         $btnGenerate.prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> <span>Consulting Gemini AI &amp; Publishing...</span>');
         showBanner('loading', '<strong>Architecting Content:</strong> Gemini AI is generating a tailored monograph and downloading featured imagery. Please hold...');
 
+        var formData = getLiveFormData();
+        formData.action = 'aureo_ai_generate_now';
+        formData.nonce  = aureoAIAdmin.nonce;
+
         $.ajax({
             url: aureoAIAdmin.ajaxUrl,
             type: 'POST',
-            data: {
-                action: 'aureo_ai_generate_now',
-                nonce: aureoAIAdmin.nonce
-            },
+            data: formData,
             success: function (res) {
                 $btnGenerate.prop('disabled', false).html(origText);
                 if (res.success) {
                     showBanner('success', '<strong>Success!</strong> ' + res.data.message + ' — <a href="' + res.data.viewUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">View Live Post</a> | <a href="' + res.data.editUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">Edit in WP</a>');
                     setTimeout(function () { location.reload(); }, 2500);
                 } else {
-                    showBanner('error', '<strong>Error:</strong> ' + res.data.message);
+                    showBanner('error', '<strong>Notice:</strong> ' + res.data.message);
                 }
             },
             error: function () {
@@ -45,7 +58,8 @@ jQuery(document).ready(function ($) {
     // 2. Test Key Trigger
     $btnTest.on('click', function (e) {
         e.preventDefault();
-        var key = $('#aureo_ai_gemini_api_key').val();
+        var key = $.trim($('#aureo_ai_gemini_api_key').val());
+        var model = $('#aureo_ai_model').val();
         var origText = $btnTest.text();
         $btnTest.prop('disabled', true).text('Testing...');
 
@@ -54,15 +68,16 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             data: {
                 action: 'aureo_ai_test_connection',
-                nonce: aureoAIAdmin.nonce,
-                api_key: key
+                nonce:   aureoAIAdmin.nonce,
+                api_key: key,
+                model:   model
             },
             success: function (res) {
                 $btnTest.prop('disabled', false).text(origText);
                 if (res.success) {
                     showBanner('success', '<strong>Verified:</strong> ' + res.data.message);
                 } else {
-                    showBanner('error', '<strong>API Key Failure:</strong> ' + res.data.message);
+                    showBanner('error', '<strong>Key Notice:</strong> ' + res.data.message);
                 }
             },
             error: function () {
@@ -72,7 +87,45 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // 3. Clear Logs Trigger
+    // 3. Fetch Account Models
+    $btnFetch.on('click', function (e) {
+        e.preventDefault();
+        var key = $.trim($('#aureo_ai_gemini_api_key').val());
+        var origText = $btnFetch.text();
+        $btnFetch.prop('disabled', true).text('Fetching...');
+
+        $.ajax({
+            url: aureoAIAdmin.ajaxUrl,
+            type: 'POST',
+            data: {
+                action:  'aureo_ai_fetch_models',
+                nonce:   aureoAIAdmin.nonce,
+                api_key: key
+            },
+            success: function (res) {
+                $btnFetch.prop('disabled', false).text(origText);
+                if (res.success) {
+                    var $select = $('#aureo_ai_model');
+                    var currVal = $select.val();
+                    $select.empty();
+                    $select.append($('<option value="auto">Auto-Detect Best Available Model</option>'));
+                    $.each(res.data.models, function(k, v) {
+                        $select.append($('<option></option>').attr('value', k).text(v));
+                    });
+                    $select.val(currVal);
+                    showBanner('success', '<strong>Live Discovery:</strong> ' + res.data.message);
+                } else {
+                    showBanner('error', '<strong>Model Discovery:</strong> ' + res.data.message);
+                }
+            },
+            error: function () {
+                $btnFetch.prop('disabled', false).text(origText);
+                showBanner('error', '<strong>Error:</strong> Could not connect to WordPress.');
+            }
+        });
+    });
+
+    // 4. Clear Logs Trigger
     $btnClearLogs.on('click', function (e) {
         e.preventDefault();
         if (!confirm('Clear all generation history logs?')) return;
@@ -82,7 +135,7 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             data: {
                 action: 'aureo_ai_clear_logs',
-                nonce: aureoAIAdmin.nonce
+                nonce:  aureoAIAdmin.nonce
             },
             success: function () {
                 $('#aureo-log-container').html('<p class="aureo-empty-text">Logs cleared.</p>');
