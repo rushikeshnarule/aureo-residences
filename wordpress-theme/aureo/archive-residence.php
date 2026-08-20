@@ -48,7 +48,7 @@ get_header();
                                     <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
                                 </a>
                                 <button onclick="aureoOpenInquiry('<?php echo esc_js( get_the_title() ); ?>')" class="px-4 py-1.5 rounded-full bg-aureo-gold-50 hover:bg-aureo-gold-600 text-aureo-gold-800 hover:text-white text-xs font-bold transition-all">
-                                    Inquire
+                                    Contact
                                 </button>
                             </div>
                         </div>

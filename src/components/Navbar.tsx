@@ -88,16 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, onOpenAIConcierge
               </a>
             </nav>
 
-            {/* AI Advisory Concierge Button */}
-            {onOpenAIConcierge && (
-              <button
-                onClick={onOpenAIConcierge}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200/80 text-stone-800 text-[10px] font-bold uppercase tracking-wider transition-colors border border-stone-200 cursor-pointer"
-                title="Open AI Architectural Concierge"
-              >
-                <Sparkles size={11} className="text-aureo-gold-700 animate-pulse" />
-                <span>AI Advisory</span>
-              </button>
+            
             )}
 
             {/* Nested CTA with "Button-in-Button" Trailing Icon */}

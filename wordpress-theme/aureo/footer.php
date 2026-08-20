@@ -29,14 +29,14 @@
                     <li><a href="<?php echo esc_url( home_url( '/#philosophy' ) ); ?>" class="footer-link">Studio Philosophy</a></li>
                     <li><a href="<?php echo esc_url( home_url( '/#details' ) ); ?>" class="footer-link">Curated Dossiers</a></li>
                     <li><a href="<?php echo esc_url( home_url( '/#journal' ) ); ?>" class="footer-link">Journal &amp; Essays</a></li>
-                    <li><a href="<?php echo esc_url( home_url( '/#inquire' ) ); ?>" class="footer-link">Private Advisory Desk</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/#inquire' ) ); ?>" class="footer-link">Contact Atelier</a></li>
                 </ul>
             </div>
 
-            <!-- Private Advisory Inquiries -->
+            <!-- Contact Atelier -->
             <div>
                 <h4 class="footer-heading" style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;margin:0 0 1rem 0;">
-                    Private Advisory Desk
+                    Contact Atelier
                 </h4>
                 <p style="font-size:0.75rem;color:#57534e;line-height:1.7;font-weight:300;margin:0 0 1rem 0;">
                     For off-market acquisitions, bespoke land commissions, or architectural press inquiries.
@@ -68,31 +68,7 @@
     </div>
 </footer>
 
-<!-- Floating Action Pill Cluster (Bottom Right) -->
-<div id="floating-cta">
-    <!-- AI Concierge Pill -->
-    <button type="button" onclick="aureoOpenInquiry('AI Spatial Advisory')" class="float-ai-pill" title="AI Spatial Advisor">
-        <span class="float-ai-indicator">
-            <span class="float-ai-ring"></span>
-            <span class="float-ai-dot"></span>
-        </span>
-        <span class="hidden sm:inline">AI Advisory Desk</span>
-    </button>
-
-    <!-- 360 View Button -->
-    <button type="button" onclick="aureoOpenVirtualTour()" class="btn-ghost" style="padding:0.625rem 1rem;font-size:0.65rem;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a67e37" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
-        <span>360° View</span>
-    </button>
-
-    <!-- Inquire Acquisition Button -->
-    <button type="button" onclick="aureoOpenInquiry('General')" class="btn-gold" style="padding:0.625rem 1.25rem;font-size:0.65rem;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        <span>Inquire</span>
-    </button>
-</div>
-
-<!-- Modal: Private Acquisition Inquiry -->
+<!-- Modal: Contact Atelier Inquiry -->
 <div id="inquiry-modal" class="aureo-modal" onclick="if(event.target===this)aureoCloseInquiry()">
     <div class="aureo-modal-dialog">
         <div class="inquiry-modal-header">
@@ -103,7 +79,7 @@
             </button>
             <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
                 <span class="eyebrow-dot"></span>
-                <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:#d7b775;">Private Advisory Service</span>
+                <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:#d7b775;">Direct Concierge Service</span>
             </div>
             <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.75rem;font-weight:700;color:#fff;margin:0 0 0.5rem 0;">Request Confidential Dossier</h3>
             <p style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin:0;line-height:1.6;max-width:32rem;">
@@ -144,7 +120,7 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 </div>
                 <h4 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.5rem;font-weight:700;color:#1c1917;margin:0 0 0.5rem 0;">Inquiry Confirmed</h4>
-                <p style="font-size:0.8rem;color:#57534e;margin:0;">A Senior Advisory Partner from our Zurich atelier will contact you via private channel within 12 hours.</p>
+                <p style="font-size:0.8rem;color:#57534e;margin:0;">Our Concierge Team from our Zurich atelier will contact you via private channel within 12 hours.</p>
             </div>
         </div>
     </div>

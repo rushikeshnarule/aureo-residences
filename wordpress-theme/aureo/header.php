@@ -33,14 +33,13 @@
                 <a href="<?php echo esc_url( home_url( '/#journal' ) ); ?>" class="nav-link">Journal</a>
             </nav>
 
-            <!-- "Button-in-button" Inquire CTA -->
-            <button type="button" onclick="aureoOpenInquiry('General')"
-                class="navbar-inquire-btn hidden sm:inline-flex" aria-label="Open inquiry">
-                <span>Inquire</span>
+            <!-- Contact Atelier Button -->
+            <a href="<?php echo esc_url( home_url( '/#contact' ) ); ?>" class="navbar-inquire-btn hidden sm:inline-flex" style="text-decoration:none;" aria-label="Contact Atelier">
+                <span>Contact</span>
                 <span class="navbar-inquire-icon">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </span>
-            </button>
+            </a>
 
             <!-- 3-line Animated Hamburger -->
             <button type="button" id="aureo-burger-btn" onclick="aureoToggleMenu()"
@@ -97,7 +96,7 @@
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
                 </span>
             </a>
-            <a href="<?php echo esc_url( home_url( '/#inquire' ) ); ?>" onclick="aureoToggleMenu()" class="menu-drawer-nav-link">
+            <a href="<?php echo esc_url( home_url( "/#contact" ) ); ?>" onclick="aureoToggleMenu()" class="menu-drawer-nav-link">
                 <span>05. Private Acquisition Registry</span>
                 <span class="menu-drawer-arrow">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>

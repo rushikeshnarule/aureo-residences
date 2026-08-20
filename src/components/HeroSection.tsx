@@ -140,15 +140,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
             </a>
 
-            {/* AI Advisory Concierge CTA */}
-            {onOpenAIConcierge && (
-              <button
-                onClick={onOpenAIConcierge}
-                className="group px-5 py-3 rounded-full bg-white/90 hover:bg-white text-stone-900 text-xs font-bold uppercase tracking-wider transition-all duration-300 shadow-md active:scale-95 border border-aureo-gold-500/40 flex items-center gap-2 backdrop-blur-sm cursor-pointer"
-              >
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>AI Advisory</span>
-              </button>
+            
             )}
 
             {/* AI Spatial Commission Brief CTA */}
