@@ -1,63 +1,66 @@
-<!-- Luxury Footer -->
-<footer class="w-full bg-stone-950 text-white border-t border-stone-800 py-16 sm:py-24">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 md:px-16">
+<!-- Luxury Footer — Warm Cream (matches React bg-[#f4f0e6]) -->
+<footer class="aureo-footer" style="padding:4rem 0 6rem;width:100%;">
+    <div style="max-width:80rem;margin:0 auto;padding:0 1.5rem;">
         
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-white/10">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:3rem;padding-bottom:4rem;border-bottom:1px solid rgba(120,113,108,0.25);">
             <!-- Brand & Studio Philosophy -->
-            <div class="md:col-span-5 flex flex-col justify-between">
+            <div style="display:flex;flex-direction:column;justify-content:space-between;">
                 <div>
-                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="text-2xl sm:text-3xl font-serif font-bold tracking-[0.3em] uppercase text-white hover:text-aureo-gold-400 transition-colors select-none">
+                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand-link"
+                        style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.75rem;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;display:block;margin-bottom:1rem;">
                         A U R E O
                     </a>
-                    <p class="mt-4 text-xs sm:text-sm text-stone-400 max-w-sm leading-relaxed font-light">
+                    <p style="font-size:0.8rem;color:#57534e;max-width:22rem;line-height:1.7;font-weight:300;margin:0;">
                         Architectural ateliers crafting monolithic private residences in Zurich, Costa Brava, and Aspen.
                     </p>
                 </div>
-                <div class="mt-8 text-xs text-stone-500 font-mono">
+                <div style="margin-top:2rem;font-size:0.75rem;color:#78716c;font-family:monospace;">
                     Zurich · Milan · Malibu · Aspen · Tokyo
                 </div>
             </div>
 
             <!-- Quick Nav Links -->
-            <div class="md:col-span-3">
-                <h4 class="text-xs font-bold uppercase tracking-widest text-aureo-gold-400 mb-4">
-                    Residences & Atelier
+            <div>
+                <h4 class="footer-heading" style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;margin:0 0 1rem 0;">
+                    Residences &amp; Atelier
                 </h4>
-                <ul class="space-y-3 text-xs text-stone-300">
-                    <li><a href="<?php echo esc_url( home_url( '/#destinations' ) ); ?>" class="hover:text-aureo-gold-400 transition-colors">Properties</a></li>
-                    <li><a href="<?php echo esc_url( home_url( '/#philosophy' ) ); ?>" class="hover:text-aureo-gold-400 transition-colors">Studio Philosophy</a></li>
-                    <li><a href="<?php echo esc_url( home_url( '/#details' ) ); ?>" class="hover:text-aureo-gold-400 transition-colors">Curated Dossiers</a></li>
-                    <li><a href="<?php echo esc_url( home_url( '/#journal' ) ); ?>" class="hover:text-aureo-gold-400 transition-colors">Journal & Essays</a></li>
-                    <li><a href="<?php echo esc_url( home_url( '/#inquire' ) ); ?>" class="hover:text-aureo-gold-400 transition-colors">Private Advisory Desk</a></li>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.75rem;font-size:0.75rem;">
+                    <li><a href="<?php echo esc_url( home_url( '/#destinations' ) ); ?>" class="footer-link">Properties</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/#philosophy' ) ); ?>" class="footer-link">Studio Philosophy</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/#details' ) ); ?>" class="footer-link">Curated Dossiers</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/#journal' ) ); ?>" class="footer-link">Journal &amp; Essays</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/#inquire' ) ); ?>" class="footer-link">Private Advisory Desk</a></li>
                 </ul>
             </div>
 
             <!-- Private Advisory Inquiries -->
-            <div class="md:col-span-4">
-                <h4 class="text-xs font-bold uppercase tracking-widest text-aureo-gold-400 mb-4">
+            <div>
+                <h4 class="footer-heading" style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.18em;margin:0 0 1rem 0;">
                     Private Advisory Desk
                 </h4>
-                <p class="text-xs text-stone-400 leading-relaxed mb-4">
+                <p style="font-size:0.75rem;color:#57534e;line-height:1.7;font-weight:300;margin:0 0 1rem 0;">
                     For off-market acquisitions, bespoke land commissions, or architectural press inquiries.
                 </p>
-                <a href="mailto:inquiries@aureo-residences.com" class="text-sm font-serif font-bold text-white hover:text-aureo-gold-400 underline decoration-aureo-gold-600 transition-colors">
+                <a href="mailto:inquiries@aureo-residences.com"
+                    style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1rem;font-weight:700;color:#1c1917;text-decoration:underline;text-decoration-color:#b88d3f;">
                     inquiries@aureo-residences.com
                 </a>
             </div>
         </div>
 
         <!-- Single Clean Copyright & Back-to-Top -->
-        <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+        <div style="padding-top:2rem;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;font-size:0.75rem;color:#78716c;">
             <div>
-                © <?php echo date( 'Y' ); ?> Aureo Architecture & Bespoke Residences. All rights reserved.
+                &copy; <?php echo date( 'Y' ); ?> Aureo Architecture &amp; Bespoke Residences. All rights reserved.
             </div>
 
-            <div class="flex items-center gap-6">
-                <a href="<?php echo esc_url( home_url( '/#destinations' ) ); ?>" class="hover:text-white transition-colors">Privacy Charter</a>
-                <a href="<?php echo esc_url( home_url( '/#destinations' ) ); ?>" class="hover:text-white transition-colors">Terms of Atelier</a>
-                <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex items-center gap-1 hover:text-white transition-colors ml-4 text-stone-400 cursor-pointer">
+            <div style="display:flex;align-items:center;gap:1.5rem;">
+                <a href="<?php echo esc_url( home_url( '/#destinations' ) ); ?>" style="color:#57534e;text-decoration:none;">Privacy Charter</a>
+                <a href="<?php echo esc_url( home_url( '/#destinations' ) ); ?>" style="color:#57534e;text-decoration:none;">Terms of Atelier</a>
+                <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                    style="display:inline-flex;align-items:center;gap:0.375rem;color:#57534e;background:none;border:none;cursor:pointer;">
                     <span>Back to Top</span>
-                    <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
                 </button>
             </div>
         </div>
@@ -65,104 +68,132 @@
     </div>
 </footer>
 
-<!-- Floating Quick Action CTA -->
-<div id="floating-cta" class="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
-    <button type="button" onclick="aureoOpenVirtualTour()" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/90 hover:bg-white text-aureo-dark backdrop-blur-md shadow-xl border border-stone-200 text-xs font-bold tracking-wider hover:border-aureo-gold-500 transition-all cursor-pointer">
-        <i data-lucide="compass" class="w-3.5 h-3.5 text-aureo-teal-700"></i>
+<!-- Floating Action Pill Cluster (Bottom Right) -->
+<div id="floating-cta">
+    <!-- AI Concierge Pill -->
+    <button type="button" onclick="aureoOpenInquiry('AI Spatial Advisory')" class="float-ai-pill" title="AI Spatial Advisor">
+        <span class="float-ai-indicator">
+            <span class="float-ai-ring"></span>
+            <span class="float-ai-dot"></span>
+        </span>
+        <span class="hidden sm:inline">AI Advisory Desk</span>
+    </button>
+
+    <!-- 360 View Button -->
+    <button type="button" onclick="aureoOpenVirtualTour()" class="btn-ghost" style="padding:0.625rem 1rem;font-size:0.65rem;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a67e37" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
         <span>360° View</span>
     </button>
-    <button type="button" onclick="aureoOpenInquiry('General')" class="flex items-center gap-2 px-5 py-3 rounded-full bg-aureo-gold-600 hover:bg-aureo-gold-700 text-white backdrop-blur-md shadow-2xl shadow-aureo-gold-950/30 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer border border-aureo-gold-400">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
-        <span>Inquire Acquisition</span>
+
+    <!-- Inquire Acquisition Button -->
+    <button type="button" onclick="aureoOpenInquiry('General')" class="btn-gold" style="padding:0.625rem 1.25rem;font-size:0.65rem;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span>Inquire</span>
     </button>
 </div>
 
 <!-- Modal: Private Acquisition Inquiry -->
-<div id="inquiry-modal" style="display: none;" class="aureo-modal fixed inset-0 z-50 bg-black/85 backdrop-blur-md items-center justify-center p-4 sm:p-6 overflow-y-auto" onclick="if(event.target===this)aureoCloseInquiry()">
-    <div class="aureo-modal-dialog relative max-w-2xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl my-auto border border-stone-100">
-        <div class="bg-gradient-to-r from-aureo-teal-950 via-aureo-teal-900 to-aureo-teal-800 p-6 sm:p-8 text-white relative">
-            <button type="button" onclick="aureoCloseInquiry()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer" aria-label="Close inquiry modal">
-                <i data-lucide="x" class="w-4 h-4 text-white"></i>
+<div id="inquiry-modal" class="aureo-modal" onclick="if(event.target===this)aureoCloseInquiry()">
+    <div class="aureo-modal-dialog">
+        <div class="inquiry-modal-header">
+            <button type="button" onclick="aureoCloseInquiry()"
+                style="position:absolute;top:1.25rem;right:1.25rem;width:2.25rem;height:2.25rem;border-radius:9999px;background:rgba(255,255,255,0.1);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;"
+                aria-label="Close inquiry modal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="w-2 h-2 rounded-full bg-aureo-gold-400 animate-pulse"></span>
-                <span class="text-[11px] font-semibold uppercase tracking-widest text-aureo-gold-400">Private Advisory Service</span>
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                <span class="eyebrow-dot"></span>
+                <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:#d7b775;">Private Advisory Service</span>
             </div>
-            <h3 class="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight">Request Confidential Dossier</h3>
-            <p class="text-xs sm:text-sm text-white/70 mt-1 max-w-lg">Direct access to our partners in Zurich, Milan, and Aspen for off-market acquisitions and bespoke architectural commissions.</p>
+            <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.75rem;font-weight:700;color:#fff;margin:0 0 0.5rem 0;">Request Confidential Dossier</h3>
+            <p style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin:0;line-height:1.6;max-width:32rem;">
+                Direct access to our partners in Zurich, Milan, and Aspen for off-market acquisitions and bespoke architectural commissions.
+            </p>
         </div>
 
-        <div class="p-6 sm:p-8 bg-white max-h-[75vh] overflow-y-auto">
-            <form id="inquiry-form" onsubmit="aureoSubmitInquiry(event)" class="space-y-5">
+        <div style="padding:1.5rem 2rem;background:#fff;max-height:75vh;overflow-y:auto;">
+            <form id="inquiry-form" onsubmit="aureoSubmitInquiry(event)" style="display:flex;flex-direction:column;gap:1.25rem;">
                 <div>
-                    <label class="text-xs font-bold uppercase tracking-wider text-aureo-dark block mb-1.5">Territory of Interest</label>
-                    <input type="text" id="inquiry-location" name="location" value="Zurich" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm font-semibold text-aureo-dark focus:outline-none focus:border-aureo-gold-600">
+                    <label style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#1c1917;display:block;margin-bottom:0.375rem;">Territory of Interest</label>
+                    <input type="text" id="inquiry-location" name="location" value="Zurich"
+                        style="width:100%;padding:0.625rem 1rem;border-radius:0.75rem;border:1px solid #e7e5e4;font-size:0.875rem;color:#1c1917;outline:none;">
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
                     <div>
-                        <label class="text-xs font-semibold text-stone-600 block mb-1.5">Full Legal Name</label>
-                        <input type="text" name="fullName" required placeholder="Lord Harrison Sterling" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm text-aureo-dark focus:outline-none focus:border-aureo-gold-600">
+                        <label style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#57534e;display:block;margin-bottom:0.375rem;">Full Legal Name</label>
+                        <input type="text" name="fullName" required placeholder="Lord Harrison Sterling"
+                            style="width:100%;padding:0.625rem 1rem;border-radius:0.75rem;border:1px solid #e7e5e4;font-size:0.875rem;color:#1c1917;outline:none;">
                     </div>
                     <div>
-                        <label class="text-xs font-semibold text-stone-600 block mb-1.5">Direct Email</label>
-                        <input type="email" name="email" required placeholder="harrison@sterling-partners.ch" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm text-aureo-dark focus:outline-none focus:border-aureo-gold-600">
+                        <label style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#57534e;display:block;margin-bottom:0.375rem;">Direct Email</label>
+                        <input type="email" name="email" required placeholder="harrison@sterling-partners.ch"
+                            style="width:100%;padding:0.625rem 1rem;border-radius:0.75rem;border:1px solid #e7e5e4;font-size:0.875rem;color:#1c1917;outline:none;">
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs font-semibold text-stone-600 block mb-1.5">Private Telephone / Signal</label>
-                    <input type="tel" name="phone" placeholder="+41 44 215 8800" class="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm text-aureo-dark focus:outline-none focus:border-aureo-gold-600">
+                    <label style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#57534e;display:block;margin-bottom:0.375rem;">Private Telephone / Signal</label>
+                    <input type="tel" name="phone" placeholder="+41 44 215 8800"
+                        style="width:100%;padding:0.625rem 1rem;border-radius:0.75rem;border:1px solid #e7e5e4;font-size:0.875rem;color:#1c1917;outline:none;">
                 </div>
-                <button type="submit" class="w-full py-3.5 rounded-2xl bg-aureo-gold-600 hover:bg-aureo-gold-700 text-white text-xs font-bold uppercase tracking-widest transition-all shadow-md cursor-pointer">
+                <button type="submit" class="btn-gold" style="width:100%;padding:0.875rem;border-radius:1rem;margin-top:0.5rem;">
                     Submit Confidential Inquiry
                 </button>
             </form>
-            <div id="inquiry-success" class="hidden py-8 text-center">
-                <i data-lucide="check-circle-2" class="w-12 h-12 text-emerald-600 mx-auto mb-3"></i>
-                <h4 class="text-xl font-serif font-bold text-aureo-dark">Inquiry Confirmed</h4>
-                <p class="text-xs text-stone-500 mt-2">A Senior Advisory Partner from our Zurich atelier will contact you via private channel within 12 hours.</p>
+            <div id="inquiry-success" style="display:none;padding:2rem;text-align:center;">
+                <div style="width:3rem;height:3rem;border-radius:9999px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h4 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.5rem;font-weight:700;color:#1c1917;margin:0 0 0.5rem 0;">Inquiry Confirmed</h4>
+                <p style="font-size:0.8rem;color:#57534e;margin:0;">A Senior Advisory Partner from our Zurich atelier will contact you via private channel within 12 hours.</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal: 360 Virtual Tour -->
-<div id="virtual-tour-modal" style="display: none;" class="aureo-modal fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex-col justify-between" onclick="if(event.target===this)aureoCloseVirtualTour()">
-    <div class="flex items-center justify-between p-4 sm:p-6 border-b border-white/10 z-20 bg-black/40">
-        <div class="flex items-center gap-3">
-            <div class="w-2.5 h-2.5 rounded-full bg-aureo-gold-500 animate-pulse"></div>
-            <h3 class="text-white text-base sm:text-lg font-serif font-bold tracking-wide">360° Cantilever Sunset Deck · Lucerne</h3>
+<div id="virtual-tour-modal" class="aureo-modal" style="padding:0;background:rgba(0,0,0,0.95);" onclick="if(event.target===this)aureoCloseVirtualTour()">
+    <div style="display:flex;flex-direction:column;width:100%;height:100%;position:relative;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.6);z-index:20;">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <span class="eyebrow-dot"></span>
+                <h3 style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.15rem;font-weight:700;color:#fff;margin:0;">360° Cantilever Sunset Deck · Lucerne</h3>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <button type="button" onclick="aureoToggleTourLighting()"
+                    style="padding:0.375rem 0.875rem;border-radius:9999px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.7rem;font-weight:700;display:flex;align-items:center;gap:0.375rem;cursor:pointer;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d7b775" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/></svg>
+                    <span id="tour-lighting-label">Twilight Mode</span>
+                </button>
+                <button type="button" onclick="aureoCloseVirtualTour()"
+                    style="width:2rem;height:2rem;border-radius:9999px;background:rgba(255,255,255,0.15);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;"
+                    aria-label="Close virtual tour">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
         </div>
-        <div class="flex items-center gap-3">
-            <!-- Day / Twilight Switcher -->
-            <button type="button" onclick="aureoToggleTourLighting()" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer">
-                <i data-lucide="sun" class="w-3.5 h-3.5 text-aureo-gold-400"></i>
-                <span id="tour-lighting-label">Twilight Mode</span>
-            </button>
-            <button type="button" onclick="aureoCloseVirtualTour()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer" aria-label="Close virtual tour">
-                <i data-lucide="x" class="w-4 h-4 text-white"></i>
-            </button>
+        <div style="flex:1;position:relative;overflow:hidden;">
+            <img id="virtual-tour-img" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1920&q=85" alt="360 Tour"
+                style="width:100%;height:100%;object-fit:cover;transition:opacity 0.5s;">
         </div>
-    </div>
-    <div class="relative flex-1 w-full overflow-hidden flex items-center justify-center">
-        <img id="virtual-tour-img" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1920&q=85" alt="360 Tour" class="w-full h-full object-cover transition-opacity duration-500">
     </div>
 </div>
 
 <!-- Modal: Image Lightbox -->
-<div id="image-lightbox-modal" style="display: none;" class="aureo-modal fixed inset-0 z-50 bg-black/90 backdrop-blur-xl items-center justify-center p-4 sm:p-8" onclick="if(event.target===this)aureoCloseLightbox()">
-    <div class="aureo-modal-dialog relative max-w-5xl w-full bg-stone-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-        <button type="button" onclick="aureoCloseLightbox()" class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center cursor-pointer">
-            <i data-lucide="x" class="w-4 h-4 text-white"></i>
+<div id="image-lightbox-modal" class="aureo-modal" onclick="if(event.target===this)aureoCloseLightbox()">
+    <div class="aureo-modal-dialog" style="max-width:56rem;background:#1c1917;color:#fff;">
+        <button type="button" onclick="aureoCloseLightbox()"
+            style="position:absolute;top:1rem;right:1rem;z-index:30;width:2.25rem;height:2.25rem;border-radius:9999px;background:rgba(0,0,0,0.6);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-        <div class="relative aspect-[16/10] w-full overflow-hidden bg-black flex items-center justify-center">
-            <img id="lightbox-img" src="" alt="Architectural Photo" class="w-full h-full object-cover">
+        <div style="position:relative;aspect-ratio:16/10;width:100%;overflow:hidden;background:#000;">
+            <img id="lightbox-img" src="" alt="Architectural Photo" style="width:100%;height:100%;object-fit:cover;">
         </div>
-        <div class="p-6 bg-stone-950 text-white flex items-center justify-between">
+        <div style="padding:1.25rem 1.75rem;background:#1c1917;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.1);">
             <div>
-                <h4 id="lightbox-title" class="text-lg font-serif font-bold text-white"></h4>
-                <p id="lightbox-caption" class="text-xs text-stone-400 mt-1"></p>
+                <h4 id="lightbox-title" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.25rem;font-weight:700;color:#fff;margin:0 0 2px 0;"></h4>
+                <p id="lightbox-caption" style="font-size:0.75rem;color:#a8a29e;margin:0;"></p>
             </div>
-            <button type="button" onclick="aureoOpenInquiry('General')" class="px-5 py-2 rounded-full bg-aureo-gold-600 hover:bg-aureo-gold-500 text-white text-xs font-bold uppercase tracking-wider">
+            <button type="button" onclick="aureoCloseLightbox();aureoOpenInquiry('General')" class="btn-gold" style="padding:0.5rem 1.25rem;font-size:0.65rem;">
                 Inquire
             </button>
         </div>
