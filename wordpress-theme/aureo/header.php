@@ -22,9 +22,7 @@
         </nav>
 
         <!-- Center Brand Serif Wordmark -->
-        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-wordmark">
-            A U R E O
-        </a>
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-wordmark"><?php echo esc_html( get_bloginfo( 'name' ) ?: 'A U R E O' ); ?></a>
 
         <!-- Right Navigation & Inquiry Trigger -->
         <div class="flex items-center" style="gap:0.75rem;">

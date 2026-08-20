@@ -196,12 +196,40 @@ h1, h2, h3, h4, .font-serif {
 .animate-on-scroll.delay-400 { transition-delay: 0.4s; }
 .animate-on-scroll.delay-500 { transition-delay: 0.5s; }
 
+
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, #d7b775, #b88d3f, #8c6a2c);
+  z-index: 9999;
+  width: 0%;
+  transition: width 0.1s ease-out;
+}
+body.admin-bar #scroll-progress {
+  top: 32px;
+}
+@media screen and (max-width: 782px) {
+  body.admin-bar #scroll-progress {
+    top: 46px;
+  }
+}
+
 #site-header {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 40;
+  z-index: 100;
   padding: 1rem 1rem 0;
   pointer-events: none;
+  transition: top 0.2s ease;
+}
+body.admin-bar #site-header {
+  top: 32px;
+}
+@media screen and (max-width: 782px) {
+  body.admin-bar #site-header {
+    top: 46px;
+  }
 }
 #site-header * { pointer-events: auto; }
 
@@ -209,24 +237,25 @@ h1, h2, h3, h4, .font-serif {
   max-width: 72rem;
   margin: 0 auto;
   border-radius: 9999px;
-  padding: 0.875rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(231,225,219,0.5);
-  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(231,225,219,0.7);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 #site-header-inner.scrolled {
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-color: rgba(214,205,195,0.9);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  border-color: rgba(214,205,195,0.95);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
 }
+
 
 .nav-link {
   font-size: 0.7rem;
