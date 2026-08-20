@@ -1,4 +1,7 @@
 jQuery(document).ready(function ($) {
+    // Instantly remove any stale notices that WordPress injected into our header
+    $('.aureo-ai-header .notice, .aureo-ai-header div.error, .aureo-ai-wrap > div.error').remove();
+
     var $banner = $('#aureo-status-banner');
     var $btnGenerate = $('#btn-generate-now');
     var $btnTest = $('#btn-test-key');
@@ -24,12 +27,12 @@ jQuery(document).ready(function ($) {
         };
     }
 
-    // 1. Generate Now Trigger
+    // 1. Generate & Index Now Trigger
     $btnGenerate.on('click', function (e) {
         e.preventDefault();
         var origText = $btnGenerate.html();
-        $btnGenerate.prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> <span>Consulting Gemini AI &amp; Publishing...</span>');
-        showBanner('loading', '<strong>Architecting Content:</strong> Gemini AI is generating a tailored monograph and downloading featured imagery. Please hold...');
+        $btnGenerate.prop('disabled', true).html('<span class="dashicons dashicons-update spin"></span> <span>Generating &amp; Broadcasting to Google...</span>');
+        showBanner('loading', '<strong>Architecting SEO Content:</strong> Generating article, tagging long-tail keywords, attaching photography, and broadcasting to Google Search Console &amp; IndexNow...');
 
         var formData = getLiveFormData();
         formData.action = 'aureo_ai_generate_now';
@@ -42,7 +45,11 @@ jQuery(document).ready(function ($) {
             success: function (res) {
                 $btnGenerate.prop('disabled', false).html(origText);
                 if (res.success) {
-                    showBanner('success', '<strong>Success!</strong> ' + res.data.message + ' — <a href="' + res.data.viewUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">View Live Post</a> | <a href="' + res.data.editUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">Edit in WP</a>');
+                    var links = ' — <a href="' + res.data.viewUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">View Live</a> | ' +
+                                '<a href="' + res.data.editUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">Edit</a> | ' +
+                                '<a href="' + res.data.googleUrl + '" target="_blank" style="color:#1d4ed8;text-decoration:underline;">Check Google Index</a> | ' +
+                                '<a href="' + res.data.gscUrl + '" target="_blank" style="color:#047857;text-decoration:underline;">Inspect in GSC</a>';
+                    showBanner('success', '<strong>Success!</strong> ' + res.data.message + links);
                     setTimeout(function () { location.reload(); }, 2500);
                 } else {
                     showBanner('error', '<strong>Notice:</strong> ' + res.data.message);
@@ -67,7 +74,7 @@ jQuery(document).ready(function ($) {
             url: aureoAIAdmin.ajaxUrl,
             type: 'POST',
             data: {
-                action: 'aureo_ai_test_connection',
+                action:  'aureo_ai_test_connection',
                 nonce:   aureoAIAdmin.nonce,
                 api_key: key,
                 model:   model
@@ -125,10 +132,34 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // 4. Clear Logs Trigger
+    // 4. Ping Google for Single Post
+    $(document).on('click', '.btn-ping-single', function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var postId = $btn.data('id');
+        $btn.text('Pinging...');
+
+        $.ajax({
+            url: aureoAIAdmin.ajaxUrl,
+            type: 'POST',
+            data: {
+                action:  'aureo_ai_ping_google',
+                nonce:   aureoAIAdmin.nonce,
+                post_id: postId
+            },
+            success: function (res) {
+                $btn.text('Pinged ✓');
+                if (res.success) {
+                    showBanner('success', '<strong>Broadcasted:</strong> ' + res.data.message);
+                }
+            }
+        });
+    });
+
+    // 5. Clear Logs Trigger
     $btnClearLogs.on('click', function (e) {
         e.preventDefault();
-        if (!confirm('Clear all generation history logs?')) return;
+        if (!confirm('Clear all publication history logs?')) return;
 
         $.ajax({
             url: aureoAIAdmin.ajaxUrl,

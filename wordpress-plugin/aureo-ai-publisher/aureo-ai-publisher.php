@@ -3,7 +3,7 @@
  * Plugin Name: Aureo AI Daily Post Publisher (Gemini & SEO Auto-Index)
  * Plugin URI: https://aureo-residences.com/
  * Description: Enterprise AI automated publishing & Google indexing engine for WordPress. Automatically generates and publishes 1–2 high-value, SEO-optimized business monographs daily with Google Search Console & IndexNow instant broadcast, JSON-LD schema, and custom niches.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Aureo Studio & Google Gemini
  * Author URI: https://aureo-residences.com/
  * License: GPL-2.0+
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'AUREO_AI_VERSION', '1.3.0' );
+define( 'AUREO_AI_VERSION', '1.3.1' );
 define( 'AUREO_AI_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AUREO_AI_URL', plugin_dir_url( __FILE__ ) );
 define( 'AUREO_AI_DEFAULT_API_KEY', 'AIzaSyDhRYhbdjBDvnEUkG-vn8gPsUamtkQRNG8' );
