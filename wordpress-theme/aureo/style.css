@@ -928,3 +928,71 @@ body.admin-bar #site-header {
   border-radius: 2px !important;
   transition: all 0.25s ease !important;
 }
+
+/* ============================================================
+   AUREO PRECISION RESPONSIVE BREAKPOINTS (Zero Overflow Mobile)
+   ============================================================ */
+@media screen and (max-width: 900px) {
+  .navbar-left,
+  .navbar-nav {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  #site-header {
+    padding: 12px 14px 0 14px !important;
+  }
+  #site-header-inner {
+    padding: 6px 14px 6px 18px !important;
+    height: 48px !important;
+    border-radius: 9999px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+  }
+  .navbar-left,
+  .navbar-nav,
+  .navbar-inquire-btn {
+    display: none !important;
+  }
+  .navbar-right {
+    gap: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .brand-wordmark {
+    font-size: clamp(0.80rem, 3.8vw, 1.0rem) !important;
+    letter-spacing: clamp(0.10em, 1.5vw, 0.22em) !important;
+    max-width: calc(100vw - 100px) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding: 0 !important;
+    text-align: left !important;
+    display: block !important;
+    line-height: 1.2 !important;
+  }
+  .aureo-menu-burger {
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  #site-header {
+    padding: 8px 10px 0 10px !important;
+  }
+  #site-header-inner {
+    padding: 4px 10px 4px 12px !important;
+    height: 44px !important;
+  }
+  .brand-wordmark {
+    font-size: 0.75rem !important;
+    letter-spacing: 0.08em !important;
+    max-width: calc(100vw - 80px) !important;
+  }
+}
