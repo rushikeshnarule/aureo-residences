@@ -12,7 +12,7 @@ get_header();
   1. HERO SECTION
 ===================================================================== -->
 <section class="relative w-full overflow-hidden hero-gradient"
-  style="padding-top:6rem;padding-bottom:4rem;border-bottom:1px solid rgba(231,225,219,0.8);">
+  style="padding-top:7.5rem;padding-bottom:4rem;border-bottom:1px solid rgba(231,225,219,0.8);">
 
   <!-- Background Video Layer -->
   <?php $video_url = get_theme_mod( 'aureo_hero_video_url', 'https://assets.mixkit.co/videos/preview/mixkit-modern-building-with-glass-facade-42998-large.mp4' ); ?>
