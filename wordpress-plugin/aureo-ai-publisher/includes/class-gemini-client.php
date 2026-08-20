@@ -1,6 +1,6 @@
 <?php
 /**
- * Google Gemini API Client & Dynamic Fallback Synthesizer
+ * Google Gemini API Client with Auto-Discovery & Multi-Model Support
  */
 if ( ! defined( "ABSPATH" ) ) {
     exit;
@@ -8,11 +8,20 @@ if ( ! defined( "ABSPATH" ) ) {
 
 class Aureo_AI_Gemini_Client {
 
-    private static $primary_model = "gemini-2.5-flash";
-    private static $fallback_model = "gemini-1.5-flash";
+    /**
+     * Candidate Gemini models in order of performance and availability
+     */
+    private static $candidate_models = array(
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-latest",
+        "gemini-1.5-pro",
+        "gemini-1.5-pro-latest",
+        "gemini-pro"
+    );
 
     /**
-     * Test connection to Gemini API
+     * Test connection to Gemini API by auto-detecting the active model
      */
     public static function test_connection( $api_key = "" ) {
         if ( empty( $api_key ) ) {
@@ -20,58 +29,70 @@ class Aureo_AI_Gemini_Client {
         }
 
         if ( empty( $api_key ) ) {
-            return new WP_Error( "no_key", "Gemini API key is required." );
+            return new WP_Error( "no_key", "Please enter a Google Gemini API key." );
         }
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/" . self::$fallback_model . ":generateContent?key=" . trim( $api_key );
+        $api_key = trim( $api_key );
+        $last_error = "";
 
-        $payload = array(
-            "contents" => array(
-                array(
-                    "parts" => array(
-                        array( "text" => "Respond with CONNECTED" )
+        // Test across candidate models and API versions
+        foreach ( self::$candidate_models as $model ) {
+            $versions = array( "v1beta", "v1" );
+            foreach ( $versions as $version ) {
+                $url = "https://generativelanguage.googleapis.com/" . $version . "/models/" . $model . ":generateContent?key=" . $api_key;
+                $payload = array(
+                    "contents" => array(
+                        array(
+                            "parts" => array(
+                                array( "text" => "Respond with CONNECTED" )
+                            )
+                        )
+                    ),
+                    "generationConfig" => array(
+                        "temperature"     => 0.1,
+                        "maxOutputTokens" => 10
                     )
-                )
-            ),
-            "generationConfig" => array(
-                "temperature"     => 0.1,
-                "maxOutputTokens" => 10
-            )
-        );
+                );
 
-        $response = wp_remote_post( $url, array(
-            "headers" => array(
-                "Content-Type"   => "application/json",
-                "x-goog-api-key" => trim( $api_key )
-            ),
-            "body"    => wp_json_encode( $payload ),
-            "timeout" => 20
-        ) );
+                $response = wp_remote_post( $url, array(
+                    "headers" => array(
+                        "Content-Type"   => "application/json",
+                        "x-goog-api-key" => $api_key
+                    ),
+                    "body"    => wp_json_encode( $payload ),
+                    "timeout" => 15
+                ) );
 
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        $code = wp_remote_retrieve_response_code( $response );
-        $body = wp_remote_retrieve_body( $response );
-        $data = json_decode( $body, true );
-
-        if ( 200 !== $code ) {
-            $msg = isset( $data["error"]["message"] ) ? $data["error"]["message"] : "HTTP " . $code;
-            if ( false !== strpos( $msg, "API key not valid" ) || false !== strpos( $msg, "API_KEY_INVALID" ) ) {
-                return new WP_Error( "invalid_key", "Google rejected this key. Create a free key at https://aistudio.google.com/app/apikey (The built-in fallback engine is active and publishing your posts uninterrupted!)." );
+                if ( ! is_wp_error( $response ) ) {
+                    $code = wp_remote_retrieve_response_code( $response );
+                    if ( 200 === $code ) {
+                        update_option( "aureo_ai_working_model", $model );
+                        update_option( "aureo_ai_api_version", $version );
+                        return array(
+                            "model"   => $model,
+                            "version" => $version,
+                            "message" => sprintf( "Connected successfully to Google %s (%s)!", $model, $version )
+                        );
+                    }
+                    $body = wp_remote_retrieve_body( $response );
+                    $data = json_decode( $body, true );
+                    if ( isset( $data["error"]["message"] ) ) {
+                        $last_error = $data["error"]["message"];
+                    }
+                }
             }
-            return new WP_Error( "api_error", $msg );
         }
 
-        return true;
+        return new WP_Error( "connection_failed", $last_error ? $last_error : "Could not connect to Gemini API. Ensure Generative Language API is enabled or grab a key from https://aistudio.google.com/app/apikey" );
     }
 
     /**
-     * Generate Structured Post Content via Gemini (with in-engine fallback)
+     * Generate Structured Post Content via Gemini (with multi-model fallback & in-engine synthesis)
      */
     public static function generate_article( $niche, $custom_instructions = "" ) {
-        $api_key = get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY );
+        $api_key       = trim( get_option( "aureo_ai_gemini_api_key", AUREO_AI_DEFAULT_API_KEY ) );
+        $working_model = get_option( "aureo_ai_working_model", "gemini-2.0-flash" );
+        $api_version   = get_option( "aureo_ai_api_version", "v1beta" );
 
         if ( ! empty( $api_key ) ) {
             $prompt_lines = array(
@@ -95,43 +116,50 @@ class Aureo_AI_Gemini_Client {
             $system_prompt = implode( "
 ", $prompt_lines );
 
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/" . self::$primary_model . ":generateContent?key=" . trim( $api_key );
+            // Build test list starting with working model
+            $models_to_try = array_unique( array_merge( array( $working_model ), self::$candidate_models ) );
 
-            $payload = array(
-                "contents" => array(
-                    array(
-                        "parts" => array(
-                            array( "text" => $system_prompt )
+            foreach ( $models_to_try as $model ) {
+                foreach ( array( $api_version, "v1beta", "v1" ) as $version ) {
+                    $url = "https://generativelanguage.googleapis.com/" . $version . "/models/" . $model . ":generateContent?key=" . $api_key;
+                    $payload = array(
+                        "contents" => array(
+                            array(
+                                "parts" => array(
+                                    array( "text" => $system_prompt )
+                                )
+                            )
+                        ),
+                        "generationConfig" => array(
+                            "temperature"      => 0.75,
+                            "maxOutputTokens"  => 4096,
+                            "responseMimeType" => "application/json"
                         )
-                    )
-                ),
-                "generationConfig" => array(
-                    "temperature"      => 0.75,
-                    "maxOutputTokens"  => 4096,
-                    "responseMimeType" => "application/json"
-                )
-            );
+                    );
 
-            $response = wp_remote_post( $url, array(
-                "headers" => array(
-                    "Content-Type"   => "application/json",
-                    "x-goog-api-key" => trim( $api_key )
-                ),
-                "body"    => wp_json_encode( $payload ),
-                "timeout" => 45
-            ) );
+                    $response = wp_remote_post( $url, array(
+                        "headers" => array(
+                            "Content-Type"   => "application/json",
+                            "x-goog-api-key" => $api_key
+                        ),
+                        "body"    => wp_json_encode( $payload ),
+                        "timeout" => 45
+                    ) );
 
-            if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-                $body = wp_remote_retrieve_body( $response );
-                $data = json_decode( $body, true );
-                $text = isset( $data["candidates"][0]["content"]["parts"][0]["text"] ) ? $data["candidates"][0]["content"]["parts"][0]["text"] : "";
+                    if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+                        $body = wp_remote_retrieve_body( $response );
+                        $data = json_decode( $body, true );
+                        $text = isset( $data["candidates"][0]["content"]["parts"][0]["text"] ) ? $data["candidates"][0]["content"]["parts"][0]["text"] : "";
 
-                if ( ! empty( $text ) ) {
-                    $clean_json = trim( preg_replace( '/^\x60{3}(?:json)?|\x60{3}$/m', '', $text ) );
-                    $parsed = json_decode( $clean_json, true );
-                    if ( is_array( $parsed ) && ! empty( $parsed["title"] ) && ! empty( $parsed["content"] ) ) {
-                        $parsed["source_engine"] = "Google Gemini 2.5 Flash";
-                        return $parsed;
+                        if ( ! empty( $text ) ) {
+                            $clean_json = trim( preg_replace( '/^\x60{3}(?:json)?|\x60{3}$/m', '', $text ) );
+                            $parsed = json_decode( $clean_json, true );
+                            if ( is_array( $parsed ) && ! empty( $parsed["title"] ) && ! empty( $parsed["content"] ) ) {
+                                update_option( "aureo_ai_working_model", $model );
+                                $parsed["source_engine"] = "Google " . $model . " (" . $version . ")";
+                                return $parsed;
+                            }
+                        }
                     }
                 }
             }
